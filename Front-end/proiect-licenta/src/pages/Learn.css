@@ -1,0 +1,13 @@
+.learn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.learn-text {
+    font-size: 2rem;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    margin: 1em 0;
+}

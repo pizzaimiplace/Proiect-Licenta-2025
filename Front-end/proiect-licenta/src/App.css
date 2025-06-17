@@ -1,0 +1,110 @@
+body {
+    background: #222;
+    color: #fff;
+    font-family: sans-serif;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.piano {
+  display: flex;
+  font-family: 'Georgia', serif;
+}
+
+.key {
+  width: 100px;
+  height: 400px;
+  background: white;
+  border: 1px solid black;
+  font-family: 'Georgia', serif;
+}
+
+.key.sharp {
+  background: black;
+  color: white;
+  height: 240px;
+  position: relative;
+  margin-left: -30px;
+  margin-right: -30px;
+  width: 60px;
+  z-index: 1;
+  font-family: 'Georgia', serif;
+}
+
+.recorder {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metronome{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metronome h3{
+  margin: 0;
+}
+
+.adsr-controls{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.adsr-controls label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mode-container {
+}
+
+.mode-container label {
+  padding: 5px;
+}
+
+.key.highlight-0 {
+  background-color: #539e1e;
+}
+.key.highlight-1 {
+  background-color: #9e1e1e;
+}
+
+.key.pressed {
+  background-color: #ffcc00;
+}
+
+.key.sharp.pressed {
+  background-color: #ffcc00;
+}
+
+.key.sharp.highlight-0 {
+  background-color: #65d914;
+}
+
+.key.sharp.highlight-1 {
+  background-color: #cb1714;
+}
+
+.scale-container label{
+  padding: 5px;
+}
+
+.wrapper {
+  display: flex;
+}

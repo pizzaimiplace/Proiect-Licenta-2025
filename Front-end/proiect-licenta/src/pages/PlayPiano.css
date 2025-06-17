@@ -1,0 +1,98 @@
+body {
+    background: #222;
+    color: #fff;
+    font-family: sans-serif;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.playpiano {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.piano {
+  display: flex;
+}
+
+.key {
+  width: 100px;
+  height: 400px;
+  background: white;
+  border: 1px solid black;
+}
+
+.key.sharp {
+  background: black;
+  color: white;
+  height: 240px;
+  position: relative;
+  margin-left: -30px;
+  margin-right: -30px;
+  width: 60px;
+  z-index: 1;
+}
+
+.recorder {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metronome{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metronome h3{
+  margin: 0;
+}
+
+.adsr-controls{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.adsr-controls label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mode-container {
+}
+
+.mode-container label {
+  padding: 5px;
+}
+
+.key.highlight {
+  background-color: #539e1e;
+}
+
+.key.pressed {
+  background-color: #ffcc00; /* Or any color you want */
+  /* Or add any other style like border, box-shadow, etc */
+}
+
+
+.key.sharp.highlight {
+  background-color: #65d914;
+}
+
+.scale-container label{
+  padding: 5px;
+}
+
+.wrapper {
+  display: flex;
+}
