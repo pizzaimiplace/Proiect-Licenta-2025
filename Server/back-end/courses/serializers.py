@@ -1,28 +1,14 @@
 from rest_framework import serializers
 
-from .models import Course, Lesson, Screen, Task, Condition
-
-class ConditionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Condition
-        fields = '__all__'
-
-class TaskSerializer(serializers.ModelSerializer):
-    condition = ConditionSerializer()
-
-    class Meta:
-        model = Task
-        fields = ['notes', 'colors', 'condition']
+from .models import Course, Lesson, Screen
 
 class ScreenSerializer(serializers.ModelSerializer):
-    task = TaskSerializer()
-
     class Meta:
         model = Screen
-        fields = ['text', 'playpiano', 'task']
+        fields = '__all__'
 
 class LessonSerializer(serializers.ModelSerializer):
-    screens = ScreenSerializer(many=True)
+    screens = ScreenSerializer(many=True, required=False)
 
     class Meta:
         model = Lesson

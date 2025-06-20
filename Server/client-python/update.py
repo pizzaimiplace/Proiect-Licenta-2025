@@ -1,6 +1,6 @@
 import requests
 
-endpoint = "http://localhost:8000/api/courses/3/update/"
+endpoint = "http://localhost:8000/api/courses/6/update/"
 
 data = {
     "title": "This is an updated course",

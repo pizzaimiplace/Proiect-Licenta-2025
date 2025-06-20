@@ -14,6 +14,9 @@ const lessonOne = {
 }
 
 const Learn = () => {
+    const [lessonData, setLessonData] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
     const [showNotes, setShowNotes] = useState(false);
     const [showKeys, setShowKeys] = useState(false);
     const [selectedHighlight, setSelectedHighlight] = useState('None');
@@ -55,33 +58,50 @@ const Learn = () => {
     const keySequenceRef = useRef([]);
 
     const handleKeyPress = (note) => {
-        if (currentDialogueIndex === 7) {
-            keySequenceRef.current.push(note);
-            if (keySequenceRef.current.length > 2) {
-                keySequenceRef.current.shift();
-            }
-            const [first, second] = keySequenceRef.current;
-            {
-                if (first === 'C4' && second === 'C5') {
-                    setCurrentDialogueIndex(8);
-                    keySequenceRef.current = [];
-                }
-            }
-        }
-        if (currentDialogueIndex === 13) {
-            const Octave4 = ['C4', 'Cs4', 'D4', 'Ds4', 'E4', 'F4', 'Fs4', 'G4', 'Gs4', 'A4', 'As4', 'B4'];
+        const currentScreen = lessonData?.screens[currentIndex];
+        const task = currentScreen?.task;
+        const condition = task?.condition;
 
-            if (!keySequenceRef.current.includes(note) && Octave4.includes(note)) {
+        if (!task || !task.notes || !condition) return;
+
+        const flattenedNotes = task.notes.flat();
+
+        if (condition.ordered && !condition.chord) {
+            keySequenceRef.current.push(note);
+            if (keySequenceRef.current.length > 2) keySequenceRef.current.shift();
+
+            const [first, second] = keySequenceRef.current;
+            const [expected1, expected2] = flattenedNotes;
+
+            if (first === expected1 && second === expected2) {
+                setCurrentIndex((prev) => prev + 1);
+                keySequenceRef.current = [];
+            }
+        } else if (
+            condition.ordered === false &&
+            condition.consecutive === false &&
+            condition.allow_mistakes === true
+        ) {
+            if (flattenedNotes.includes(note) && !keySequenceRef.current.includes(note)) {
                 keySequenceRef.current.push(note);
             }
 
-            const allNotesPlayed = Octave4.every(n => keySequenceRef.current.includes(n));
-            if (allNotesPlayed) {
-                setCurrentDialogueIndex((prev) => prev + 1);
+            const allPlayed = flattenedNotes.every(n => keySequenceRef.current.includes(n));
+
+            if (allPlayed) {
+                setCurrentIndex((prev) => prev + 1);
                 keySequenceRef.current = [];
             }
         }
     };
+
+
+    useEffect(() => {
+        fetch('http://localhost:8000/api/courses/8/lessons/1/')
+            .then(res => res.json())
+            .then(data => setLessonData(data))
+            .catch(err => console.error("Error lesson fetch:", err));
+    }, []);
 
 
     useEffect(() => {
@@ -97,53 +117,59 @@ const Learn = () => {
         mediaStreamDest.current = dest;
     }, []);
 
+    const advanceDialogue = () => {
+        setCurrentIndex((prev) => {
+            const next = prev + 1;
+            return next < (lessonData?.screens.length || 0) ? next : prev;
+        });
+    };
+
     useEffect(() => {
-        const handleButton = (e) => {
-            setCurrentDialogueIndex((prev) => {
-                if (prev === 7) return prev;
-                return (prev + 1) % dialogue.length;
-            });
+        const handleClick = () => {
+            const currentScreen = lessonData?.screens[currentIndex];
+            if (!currentScreen?.play_piano) {
+                advanceDialogue();
+            }
         };
 
-        document.addEventListener('click', handleButton);
+        document.addEventListener('click', handleClick);
         return () => {
-            document.removeEventListener('click', handleButton);
+            document.removeEventListener('click', handleClick);
         };
-    }, [dialogue.length]);
+    }, [lessonData, currentIndex]);
 
-    useEffect(() => {
-        if (currentDialogueIndex === 2) {
-            setSelectedHighlight('White Keys');
-        } else if (currentDialogueIndex === 3) {
-            setSelectedHighlight('Black Keys');
-        } else if (currentDialogueIndex === 5) {
-            setSelectedHighlight('Octaves');
-        } else if (currentDialogueIndex === 7) {
-            setSelectedHighlight('NotesAcrossOctaves');
-        } else if (currentDialogueIndex === 9) {
-            setShowKeys(true);
-        } else {
-            setSelectedHighlight('None');
-        }
-    }, [currentDialogueIndex]);
+    console.log('lessonData:', lessonData);
+    console.log('lessonData keys:', lessonData ? Object.keys(lessonData) : 'lessonData is null');
+  console.log('currentIndex:', currentIndex);
+  console.log('screens:', lessonData?.screens);
+  console.log('currentScreen:', lessonData?.screens ? lessonData.screens[currentIndex] : null);
+
+    const currentScreen = lessonData?.screens ? lessonData.screens[currentIndex] : null;
+    const highlightedNotes = currentScreen?.task?.notes || [];
 
 
     return (
         <div className="learn">
-            <div className="learn-text">{dialogue[currentDialogueIndex]}</div>
-            {audioCtx && masterGain.current && (
-                <Piano
-                mode={mode}
-                wave={wave}
-                audioCtx={audioCtx}
-                adsrSettings={adsr}
-                masterGain={masterGain.current}
-                highlightedNotes={lessonOne[selectedHighlight]}
-                onKeyPress={handleKeyPress}
-                showNote={showNotes}
-                showKey={showKeys}
-                />
-            )}   
+            {currentScreen ? (
+               <> 
+                    <div className="learn-text">{currentScreen?.text}</div>
+                    {audioCtx && masterGain.current && (
+                        <Piano
+                        mode={mode}
+                        wave={wave}
+                        audioCtx={audioCtx}
+                        adsrSettings={adsr}
+                        masterGain={masterGain.current}
+                        highlightedNotes={highlightedNotes}
+                        onKeyPress={handleKeyPress}
+                        showNote={showNotes}
+                        showKey={showKeys}
+                        />
+                    )}
+                </>
+            ) : (
+                <div>Loading...</div>
+            )}
         </div>
     );
 };

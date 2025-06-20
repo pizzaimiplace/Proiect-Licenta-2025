@@ -21,30 +21,32 @@ class Screen(models.Model):
     text = models.TextField()
     play_piano = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"Screen for {self.lesson.title}"
+    notes = models.JSONField(null=True, blank=True)
+    color = models.CharField(max_length=50, null=True, blank=True)
 
-
-class Task(models.Model):
-    screen = models.OneToOneField(Screen, related_name='task', on_delete=models.CASCADE)
-    notes = models.JSONField()
-    color = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"Task for {self.screen}"
-
-
-class Condition(models.Model):
-    task = models.OneToOneField(Task, related_name='condition', on_delete=models.CASCADE)
-
-    ordered = models.BooleanField(default=True)
-    consecutive = models.BooleanField(default=False)
-    allow_mistakes = models.BooleanField(default=True)
-    chord = models.BooleanField(default=False)
+    ordered = models.BooleanField(null=True, blank=True)
+    consecutive = models.BooleanField(null=True, blank=True)
+    allow_mistakes = models.BooleanField(null=True, blank=True)
+    chord = models.BooleanField(null=True, blank=True)
 
     def clean(self):
-        if self.chord and self.ordered:
-            raise ValidationError("Chord and ordered both are True")
+        if self.play_piano:
+            if not self.notes or not self.color:
+                raise ValidationError("play_piano == True, notes and color are null/blank")
+
+            if self.ordered is None or self.consecutive is None or self.allow_mistakes is None or self.chord is None:
+                raise ValidationError("play_piano == True, conditions are null/blank")
+
+            if self.chord and self.ordered:
+                raise ValidationError("Chord and ordered are both True")
+        else:
+            if self.notes or self.color or any([
+                self.ordered is not None,
+                self.consecutive is not None,
+                self.allow_mistakes is not None,
+                self.chord is not None
+            ]):
+                raise ValidationError("play_piano == False, task and condition are not null/blank")
 
     def __str__(self):
-        return f"Condition for {self.task}"
+        return f"Screen for {self.lesson.title}"
