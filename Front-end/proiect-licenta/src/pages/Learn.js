@@ -2,24 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import Piano from '../components/Piano';
 import './Learn.css';
 
-
-const lessonOne = {
-    'None' : [],
-    'White Keys' : [['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5']],
-    'Black Keys' : [['Cs4', 'Ds4', 'Fs4', 'Gs4', 'As4', 'Cs5', 'Ds5', 'Fs5', 'Gs5', 'As5']],
-    'Octaves' : [['C4', 'Cs4', 'D4', 'Ds4', 'E4', 'F4', 'Fs4', 'G4', 'Gs4', 'A4', 'As4', 'B4'], ['C5', 'Cs5', 'D5', 'Ds5', 'E5', 'F5', 'Fs5', 'G5', 'Gs5', 'A5', 'As5', 'B5']],
-    'NotesAcrossOctaves' : [['C4'], ['C5']],
-    'NaturalFirstOc' :  [['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4']],
-    'SharpFirstOc' : [['Cs4', 'Ds4', 'Fs4', 'Gs4', 'As4']]
-}
-
 const Learn = () => {
+    const [courseData, setCourseData] = useState([]);
+    const [courseId, setCourseId] = useState(null);
+
     const [lessonData, setLessonData] = useState(null);
+    const [lessonId, setLessonId] = useState(null);
+
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const [showNotes, setShowNotes] = useState(false);
     const [showKeys, setShowKeys] = useState(false);
-    const [selectedHighlight, setSelectedHighlight] = useState('None');
+
     const [mode, setMode] = useState('oscillator');
     const [wave, setWave] = useState('sine');
     const [adsr, setAdsr] = useState({
@@ -35,26 +29,6 @@ const Learn = () => {
     const masterGain = useRef(null);
     const mediaStreamDest = useRef(null);
 
-    const dialogue = [
-        "Welcome to your first music theory lesson!",
-        "Today I will teach you the basics! Let's start.",
-        "The white notes are called Natural notes",
-        "The black notes are called Sharp notes",
-        "As you can see, this piano has 24 notes.",
-        "That's because this piano has 2 octaves, as highlighted below!",
-        "The notes of each octave are exactly the same, but the frequency is doubled.",
-        "Try pressing the same key of each octave, to do that press 'Z' and 'Y'",
-        "Also, keep in mind that the difference between the same key on 2 consecutive octaves is always 12 notes, neat trick!",
-        "Perfect! As you've seen, each key is binded to a button on your keyboard",
-        "Buttons from 'Z' to 'M' represent the natural notes of the first octave",
-        "Buttons from 'S' to 'J' represent the sharp notes of the first octave",
-        "Same principle applies for the second octave, 'Y' through ']', respectively '7' to '='",
-        "Try singing all the notes of the first octave!",
-        "Great, you're done with the first lesson, now it's Quiz Time!",
-        "That's not right, try again!"
-    ];
-
-    const [currentDialogueIndex, setCurrentDialogueIndex] = useState(0);
     const keySequenceRef = useRef([]);
 
     const handleKeyPress = (note) => {
@@ -95,13 +69,52 @@ const Learn = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await fetch(`http://localhost:8000/api/courses/`);
+                const json = await response.json();
+                setCourseData(json);
+            } catch(err) {
+                console.error("Error lesson fetch:", err);
+            }
+        };
+
+        fetchCourses(); 
+    }, []);
+
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/courses/8/lessons/1/')
-            .then(res => res.json())
-            .then(data => setLessonData(data))
-            .catch(err => console.error("Error lesson fetch:", err));
-    }, []);
+        if(!courseId) {
+            console.log("ALOOOO");
+            return;}
+        const fetchCourseById = async () => {
+            try {
+                const response = await fetch(`http://localhost:8000/api/courses/${courseId}/lessons/`);
+                const json = await response.json();
+                setLessonData(json);
+            } catch(err) {
+                console.error("Error lesson fetch:", err);
+            }
+        };
+
+        fetchCourseById(); 
+    }, [courseId]);
+
+    useEffect(() => {
+        if(!courseId || !lessonId) return;
+        const fetchLesson = async () => {
+            try {
+                const response = await fetch(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/`);
+                const json = await response.json();
+                setLessonData(json);
+            } catch(err) {
+                console.error("Error lesson fetch:", err);
+            }
+        };
+
+        fetchLesson(); 
+    }, [lessonId]);
 
 
     useEffect(() => {
@@ -138,11 +151,11 @@ const Learn = () => {
         };
     }, [lessonData, currentIndex]);
 
-    console.log('lessonData:', lessonData);
+    /*console.log('lessonData:', lessonData);
     console.log('lessonData keys:', lessonData ? Object.keys(lessonData) : 'lessonData is null');
-  console.log('currentIndex:', currentIndex);
-  console.log('screens:', lessonData?.screens);
-  console.log('currentScreen:', lessonData?.screens ? lessonData.screens[currentIndex] : null);
+    console.log('currentIndex:', currentIndex);
+    console.log('screens:', lessonData?.screens);
+    console.log('currentScreen:', lessonData?.screens ? lessonData.screens[currentIndex] : null);*/
 
     const currentScreen = lessonData?.screens ? lessonData.screens[currentIndex] : null;
     const highlightedNotes = currentScreen?.task?.notes || [];
@@ -150,7 +163,29 @@ const Learn = () => {
 
     return (
         <div className="learn">
-            {currentScreen ? (
+            <h1>Select a Course</h1>
+            <div>
+                {courseData.map(course => (
+                <button key={course.id} onClick={() => setCourseId(course.id)}>
+                    {course.title}
+                </button>
+                ))}
+            </div>
+
+            {courseId && lessonData && (
+                <>
+                <h2>Select a Lesson</h2>
+                    <div>
+                        {lessonData.map(lesson => (
+                        <button key={lesson.id} onClick={() => setLessonId(lesson.id)}>
+                            {lesson.title}
+                        </button>
+                        ))}
+                    </div>
+                </>
+            )}
+
+            {currentScreen && (
                <> 
                     <div className="learn-text">{currentScreen?.text}</div>
                     {audioCtx && masterGain.current && (
@@ -167,8 +202,6 @@ const Learn = () => {
                         />
                     )}
                 </>
-            ) : (
-                <div>Loading...</div>
             )}
         </div>
     );
