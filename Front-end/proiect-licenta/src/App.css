@@ -1,5 +1,5 @@
 body {
-    background: #222;
+    background: #2e0a0a;
     color: #fff;
     font-family: sans-serif;
     text-align: center;
@@ -18,7 +18,7 @@ body {
 
 .piano {
   display: flex;
-  font-family: 'Georgia', serif;
+  font-family: Verdana, sans-serif;
 }
 
 .key {
@@ -26,7 +26,7 @@ body {
   height: 400px;
   background: white;
   border: 1px solid black;
-  font-family: 'Georgia', serif;
+  font-family: Verdana, sans-serif;
 }
 
 .key.sharp {
@@ -38,7 +38,7 @@ body {
   margin-right: -30px;
   width: 60px;
   z-index: 1;
-  font-family: 'Georgia', serif;
+  font-family: Verdana, sans-serif;
 }
 
 .recorder {
@@ -86,11 +86,11 @@ body {
 }
 
 .key.pressed {
-  background-color: #ffcc00;
+  background-color: #bebebe;
 }
 
 .key.sharp.pressed {
-  background-color: #ffcc00;
+  background-color: #bebebe;
 }
 
 .key.sharp.highlight-0 {

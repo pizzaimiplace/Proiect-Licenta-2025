@@ -1,3 +1,11 @@
 .piano {
   font-family: 'Georgia', serif;
 }
+
+.piano button {
+  border-radius: 5px;
+}
+
+.piano button:hover {
+  background-color: #bebebe;
+}

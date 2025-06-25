@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Piano from '../components/Piano';
+import Api from "../Api";
 import './Learn.css';
 
 const Learn = () => {
@@ -34,8 +35,6 @@ const Learn = () => {
     const keySequenceRef = useRef([]);
 
     const handleKeyPress = (note) => {
-        /*setCurrentLesson(lessonList.find(lesson => lesson.id === lessonId));
-        setCurrentScreen(currentLesson?.screens[currentIndex]);*/
         const task = currentScreen?.task;
         const condition = task?.condition;
 
@@ -75,9 +74,8 @@ const Learn = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/courses/`);
-                const json = await response.json();
-                setCourseList(json);
+                const response = await Api.get(`http://localhost:8000/api/courses/`);
+                setCourseList(response.data);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -92,9 +90,8 @@ const Learn = () => {
             return;}
         const fetchCourseById = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/courses/${courseId}/lessons/`);
-                const json = await response.json();
-                setLessonList(json);
+                const response = await Api.get(`http://localhost:8000/api/courses/${courseId}/lessons/`);
+                setLessonList(response.data);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -107,10 +104,8 @@ const Learn = () => {
         if(!courseId || !lessonId) return;
         const fetchLesson = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/`);
-                const json = await response.json();
-                console.log(json);
-                setCurrentLesson(json);
+                const response = await Api.get(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/`);
+                setCurrentLesson(response.data);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -161,6 +156,8 @@ const Learn = () => {
         };
     }, [lessonId, currentScreen, advanceDialogue]);
 
+    const isLastScreen = currentLesson && currentIndex === currentLesson.screens.length - 1;
+
     return (
         <div className="learn">
             {!courseId && (
@@ -204,6 +201,20 @@ const Learn = () => {
                         showNote={showNotes}
                         showKey={showKeys}
                         />
+                    )}
+                    {isLastScreen && (
+                        <div className="learn-button-container">
+                            <button onClick={() => {
+                                setLessonId(null);
+                                setLessonList([]);
+                                setCourseId(null);
+                                setCurrentLesson(null);
+                                setCurrentScreen(null);
+                                setCurrentIndex(0);
+                            }}>
+                                Return to Course Selection
+                            </button>
+                        </div>
                     )}
                 </>
             )}
