@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import './Piano.css';
 
 const keys = [
@@ -29,10 +29,21 @@ const keys = [
 ];
 
 const Piano = ({ mode, wave, audioCtx, adsrSettings, masterGain, highlightedNotes = [], onKeyPress, showNote, showKey }) => {
-    const samples = {};
+    /*const samples = {};
     keys.forEach(({ note }) => {
         samples[note] = new Audio(`sounds/${note}.mp3`);
-    });
+    });*/
+
+    const samplesRef = useRef({});
+
+    useEffect(() => {
+        const newSamples = {};
+        keys.forEach(({ note }) => {
+            newSamples[note] = new Audio(`sounds/${note}.mp3`);
+        });
+        samplesRef.current = newSamples;
+    }, []);
+
     const [pressedKeys, setPressedKeys] = useState([]);
 
     const playOscillator = (freq) => {
@@ -120,14 +131,15 @@ const Piano = ({ mode, wave, audioCtx, adsrSettings, masterGain, highlightedNote
         } 
         else {
            
-            const audio = samples[note];
+            //const audio = samples[note];
+            const original =samplesRef.current[note];
 
-            if (audio) {
+            if (original) {
                 
-                const original = samples[note];
+                //const original = samples[note];
                 const audio = original.cloneNode();
-                const source = audioCtx.createMediaElementSource(audio);
-                source.connect(masterGain);
+                /*const source = audioCtx.createMediaElementSource(audio);
+                source.connect(masterGain);*/
                 audio.play();   
             }
         }
@@ -175,7 +187,6 @@ const Piano = ({ mode, wave, audioCtx, adsrSettings, masterGain, highlightedNote
         {keys.map(({ note, key : keyboardKey, isSharp }) => {
             const isHighlighted = highlightedNotes && highlightedNotes.length > 0 && highlightedNotes.includes(note);
             const highlightGroupIndex = highlightedNotes.findIndex(group => group.includes(note));
-            console.log(highlightedNotes);
             const isPressed = pressedKeys.includes(note);
             return (
                 <button

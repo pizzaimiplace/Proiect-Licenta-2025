@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Piano from '../components/Piano';
 import './Learn.css';
 
 const Learn = () => {
-    const [courseData, setCourseData] = useState([]);
+    const [courseList, setCourseList] = useState([]);
     const [courseId, setCourseId] = useState(null);
 
-    const [lessonData, setLessonData] = useState(null);
+    const [lessonList, setLessonList] = useState([]);
     const [lessonId, setLessonId] = useState(null);
-
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    const [currentScreen, setCurrentScreen] = useState(null);
+    const [currentLesson, setCurrentLesson] = useState(null);
 
     const [showNotes, setShowNotes] = useState(false);
     const [showKeys, setShowKeys] = useState(false);
@@ -32,7 +34,8 @@ const Learn = () => {
     const keySequenceRef = useRef([]);
 
     const handleKeyPress = (note) => {
-        const currentScreen = lessonData?.screens[currentIndex];
+        /*setCurrentLesson(lessonList.find(lesson => lesson.id === lessonId));
+        setCurrentScreen(currentLesson?.screens[currentIndex]);*/
         const task = currentScreen?.task;
         const condition = task?.condition;
 
@@ -74,7 +77,7 @@ const Learn = () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/courses/`);
                 const json = await response.json();
-                setCourseData(json);
+                setCourseList(json);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -86,13 +89,12 @@ const Learn = () => {
 
     useEffect(() => {
         if(!courseId) {
-            console.log("ALOOOO");
             return;}
         const fetchCourseById = async () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/courses/${courseId}/lessons/`);
                 const json = await response.json();
-                setLessonData(json);
+                setLessonList(json);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -107,7 +109,8 @@ const Learn = () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/`);
                 const json = await response.json();
-                setLessonData(json);
+                console.log(json);
+                setCurrentLesson(json);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -130,16 +133,23 @@ const Learn = () => {
         mediaStreamDest.current = dest;
     }, []);
 
-    const advanceDialogue = () => {
+    const advanceDialogue = useCallback(() => {
         setCurrentIndex((prev) => {
             const next = prev + 1;
-            return next < (lessonData?.screens.length || 0) ? next : prev;
+            return next < (currentLesson?.screens.length || 0) ? next : prev;
         });
-    };
+    }, [currentLesson]);
 
     useEffect(() => {
+        if (currentLesson) {
+            setCurrentScreen(currentLesson.screens?.[currentIndex] || null);
+        }
+    }, [currentLesson, currentIndex]);
+
+
+    useEffect(() => {
+        if(!lessonId) return;
         const handleClick = () => {
-            const currentScreen = lessonData?.screens[currentIndex];
             if (!currentScreen?.play_piano) {
                 advanceDialogue();
             }
@@ -149,34 +159,28 @@ const Learn = () => {
         return () => {
             document.removeEventListener('click', handleClick);
         };
-    }, [lessonData, currentIndex]);
-
-    /*console.log('lessonData:', lessonData);
-    console.log('lessonData keys:', lessonData ? Object.keys(lessonData) : 'lessonData is null');
-    console.log('currentIndex:', currentIndex);
-    console.log('screens:', lessonData?.screens);
-    console.log('currentScreen:', lessonData?.screens ? lessonData.screens[currentIndex] : null);*/
-
-    const currentScreen = lessonData?.screens ? lessonData.screens[currentIndex] : null;
-    const highlightedNotes = currentScreen?.task?.notes || [];
-
+    }, [lessonId, currentScreen, advanceDialogue]);
 
     return (
         <div className="learn">
-            <h1>Select a Course</h1>
-            <div>
-                {courseData.map(course => (
-                <button key={course.id} onClick={() => setCourseId(course.id)}>
-                    {course.title}
-                </button>
-                ))}
-            </div>
-
-            {courseId && lessonData && (
+            {!courseId && (
                 <>
-                <h2>Select a Lesson</h2>
-                    <div>
-                        {lessonData.map(lesson => (
+                    <h1>Select a Course</h1>
+                    <div className="learn-button-container">
+                        {courseList.map(course => (
+                        <button key={course.id} onClick={() => setCourseId(course.id)}>
+                            {course.title}
+                        </button>
+                        ))}
+                    </div>
+                </>
+            )}
+
+            {courseId && !lessonId && (
+                <>
+                    <h2>Select a Lesson</h2>
+                    <div className="learn-button-container">
+                        {lessonList.map(lesson => (
                         <button key={lesson.id} onClick={() => setLessonId(lesson.id)}>
                             {lesson.title}
                         </button>
@@ -185,7 +189,7 @@ const Learn = () => {
                 </>
             )}
 
-            {currentScreen && (
+            {lessonId && (
                <> 
                     <div className="learn-text">{currentScreen?.text}</div>
                     {audioCtx && masterGain.current && (
@@ -195,7 +199,7 @@ const Learn = () => {
                         audioCtx={audioCtx}
                         adsrSettings={adsr}
                         masterGain={masterGain.current}
-                        highlightedNotes={highlightedNotes}
+                        highlightedNotes={currentScreen?.task?.notes || []}
                         onKeyPress={handleKeyPress}
                         showNote={showNotes}
                         showKey={showKeys}

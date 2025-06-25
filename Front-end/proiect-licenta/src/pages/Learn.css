@@ -11,3 +11,29 @@
     line-height: 1.6;
     margin: 1em 0;
 }
+
+.learn-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.learn-button-container button {
+  width: 200px;
+  padding: 15px 30px;
+  font-size: 1.5rem;
+  font-family: Verdana, sans-serif;
+  border: 4px solid #c3b70c;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  transition: transform 0.2s ease;
+}
+
+.learn-button-container button:hover {
+  background-color: #fff562;
+  transform: translateY(10px);
+}
