@@ -14,6 +14,7 @@ urlpatterns = [
     path('<int:course_id>/lessons/<int:lesson_id>/', views.LessonMixinView.as_view(), name='lesson-detail'),
     path('<int:course_id>/lessons/<int:lesson_id>/update/', views.LessonMixinView.as_view(), name='lesson-update'),
     path('<int:course_id>/lessons/<int:lesson_id>/delete/', views.LessonMixinView.as_view(), name='lesson-destroy'),
+    path('<int:course_id>/lessons/<int:lesson_id>/complete/', views.complete_lesson_view, name='lesson-complete'),
 
     path('<int:course_id>/lessons/<int:lesson_id>/screens/', views.ScreenMixinView.as_view(), name='screen-create'),
     path('<int:course_id>/lessons/<int:lesson_id>/screens/<int:screen_id>/', views.ScreenMixinView.as_view(), name='screen-detail'),

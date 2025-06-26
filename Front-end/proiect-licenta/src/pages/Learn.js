@@ -204,13 +204,20 @@ const Learn = () => {
                     )}
                     {isLastScreen && (
                         <div className="learn-button-container">
-                            <button onClick={() => {
-                                setLessonId(null);
-                                setLessonList([]);
-                                setCourseId(null);
-                                setCurrentLesson(null);
-                                setCurrentScreen(null);
-                                setCurrentIndex(0);
+                            <button onClick={async () => {
+                                try {
+                                    await Api.post(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/complete/`);
+                                    console.log("Lesson marked as completed");
+                                } catch (error) {
+                                    console.error("Error marking lesson complete:", error);
+                                } finally {
+                                    setLessonId(null);
+                                    setLessonList([]);
+                                    setCourseId(null);
+                                    setCurrentLesson(null);
+                                    setCurrentScreen(null);
+                                    setCurrentIndex(0);
+                                }
                             }}>
                                 Return to Course Selection
                             </button>
