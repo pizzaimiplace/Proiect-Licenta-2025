@@ -1,0 +1,48 @@
+.metronome {
+  background-color: #660000;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.metronome h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.metronome label {
+  font-weight: bold;
+  color: #ffffff;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.metronome input[type="number"] {
+  padding: 0.4rem;
+  width: 80px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.metronome button {
+  display: block;
+  padding: 0.5rem 1.2rem;
+  background-color: #b69b00;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.metronome button:hover {
+  background-color: rgb(149, 144, 0);
+}

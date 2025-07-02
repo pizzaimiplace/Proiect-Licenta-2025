@@ -1,4 +1,5 @@
 import React from 'react';
+import './ADSRControls.css';
 
 const ADSRControls = ({ adsr, setAdsr, wave, setWave}) => {
   const handleChange = (e) => {

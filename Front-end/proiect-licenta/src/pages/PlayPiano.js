@@ -109,12 +109,14 @@ const PlayPiano = () => {
           showNote={true}
           showKey={false}
         />
-      )}      
-      {audioCtx && <Metronome audioCtx={audioCtx} />}
-
-      {audioCtx && masterGain.current && (
-        <Recorder audioCtx={audioCtx} masterGain={masterGain.current} />
       )}
+      <div className='playpiano-wrapper'>      
+        {audioCtx && <Metronome audioCtx={audioCtx} />}
+
+        {audioCtx && masterGain.current && (
+          <Recorder audioCtx={audioCtx} masterGain={masterGain.current} />
+        )}
+      </div>
     </div>
   );
 };

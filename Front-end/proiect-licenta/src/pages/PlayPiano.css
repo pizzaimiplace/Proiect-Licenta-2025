@@ -48,7 +48,6 @@ body {
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
 .metronome h3{
@@ -80,8 +79,7 @@ body {
 }
 
 .key.pressed {
-  background-color: #ffcc00; /* Or any color you want */
-  /* Or add any other style like border, box-shadow, etc */
+  background-color: #ffcc00;
 }
 
 
@@ -93,6 +91,20 @@ body {
   padding: 5px;
 }
 
-.wrapper {
+.playpiano-wrapper{
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.wrapper select{
+  display: flex;
+  padding: 0.4rem;
+  border-radius: 5px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  font-size: 1rem;
+  cursor: pointer;
 }

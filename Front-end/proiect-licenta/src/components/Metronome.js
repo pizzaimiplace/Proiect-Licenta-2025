@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import './Metronome.css';
 
 const Metronome = ({ audioCtx }) => {
   const [isPlaying, setIsPlaying] = useState(false);

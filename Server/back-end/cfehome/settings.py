@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'api',
     'courses',
     'quizzes',
-    'profiles',
     'users',
 ]
 

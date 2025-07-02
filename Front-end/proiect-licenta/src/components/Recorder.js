@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import "./Recorder.css";
 
 const Recorder = ({ audioCtx, masterGain}) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -9,9 +10,8 @@ const Recorder = ({ audioCtx, masterGain}) => {
   const startRecording = () => {
   const dest = audioCtx.createMediaStreamDestination();
 
-  // Assume you have access to masterGain
-  masterGain.connect(dest); // Send audio to recording
-  masterGain.connect(audioCtx.destination); // Send audio to speakers
+  masterGain.connect(dest);
+  masterGain.connect(audioCtx.destination);
 
   mediaRecorder.current = new MediaRecorder(dest.stream);
   mediaRecorder.current.ondataavailable = (e) => recordedChunks.current.push(e.data);

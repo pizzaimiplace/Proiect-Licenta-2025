@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Piano from '../components/Piano';
+import Api from "../Api";
 import './Quiz.css';
 
 const Quiz = () => {
@@ -30,18 +31,15 @@ const Quiz = () => {
     const mediaStreamDest = useRef(null);
 
     const keySequenceRef = useRef([]);
+    const keySequenceTimer = useRef(null);
+
 
     const handleKeyPress = (note) => {
-        /*setCurrentLesson(lessonList.find(lesson => lesson.id === lessonId));
-        setCurrentScreen(currentLesson?.screens[currentIndex]);*/
-        const task = currentScreen?.task;
-        const condition = task?.condition;
 
-        if (!task || !task.notes || !condition) return;
+        if (!currentScreen || !currentScreen.notes) return;
+        const flattenedNotes = currentScreen.notes.flat();
 
-        const flattenedNotes = task.notes.flat();
-
-        if (condition.ordered && !condition.chord) {
+        if (currentScreen.ordered && !currentScreen.chord) {
             keySequenceRef.current.push(note);
             if (keySequenceRef.current.length > 2) keySequenceRef.current.shift();
 
@@ -53,9 +51,9 @@ const Quiz = () => {
                 keySequenceRef.current = [];
             }
         } else if (
-            condition.ordered === false &&
-            condition.consecutive === false &&
-            condition.allow_mistakes === true
+            currentScreen.ordered === false &&
+            currentScreen.consecutive === false &&
+            currentScreen.allow_mistakes === true
         ) {
             if (flattenedNotes.includes(note) && !keySequenceRef.current.includes(note)) {
                 keySequenceRef.current.push(note);
@@ -67,15 +65,34 @@ const Quiz = () => {
                 setCurrentIndex((prev) => prev + 1);
                 keySequenceRef.current = [];
             }
+        } else if (currentScreen.chord === true){
+            if (flattenedNotes.includes(note) && !keySequenceRef.current.includes(note)) {
+                keySequenceRef.current.push(note);
+
+                if (keySequenceTimer.current) {
+                    clearTimeout(keySequenceTimer.current);
+                }
+
+                keySequenceTimer.current = setTimeout(() => {
+                    const allPlayed = flattenedNotes.every(n => keySequenceRef.current.includes(n));
+
+                    if (allPlayed) {
+                        setCurrentIndex(prev => prev + 1);
+                    }
+
+                    keySequenceRef.current = [];
+                    keySequenceTimer.current = null;
+                }, 500);
+            }
         }
     };
 
     useEffect(() => {
         const fetchQuizzes = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/quizzes/`);
-                const json = await response.json();
-                setQuizList(json);
+                const response = await Api.get(`http://localhost:8000/api/quizzes/`);
+                setQuizList(response.data);
+                console.log(response.data);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -88,9 +105,9 @@ const Quiz = () => {
         if(!quizId) return;
         const fetchQuizById = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/quizzes/${quizId}/`);
-                const json = await response.json();
-                setCurrentQuiz(json);
+                const response = await Api.get(`http://localhost:8000/api/quizzes/${quizId}/`);
+                setCurrentQuiz(response.data);
+                console.log(response.data);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -130,9 +147,6 @@ const Quiz = () => {
     useEffect(() => {
         if(!quizId) return;
         const handleClick = () => {
-            if (!currentScreen?.play_piano) {
-                advanceDialogue();
-            }
         };
 
         document.addEventListener('click', handleClick);

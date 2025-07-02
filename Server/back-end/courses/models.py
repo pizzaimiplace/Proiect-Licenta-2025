@@ -17,7 +17,7 @@ class Lesson(models.Model):
 
 
 class Screen(models.Model):
-    lesson = models.ForeignKey(Lesson, related_name='screens', null=True, blank=True, on_delete=models.SET_NULL)
+    lesson = models.ForeignKey(Lesson, related_name='screens', null=True, blank=True, on_delete=models.CASCADE)
     text = models.TextField()
     play_piano = models.BooleanField(default=False)
 

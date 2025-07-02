@@ -47,16 +47,7 @@ body {
   gap: 1rem;
 }
 
-.metronome{
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 0.5rem;
-}
 
-.metronome h3{
-  margin: 0;
-}
 
 .adsr-controls{
   display: flex;

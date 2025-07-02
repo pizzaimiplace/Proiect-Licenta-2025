@@ -35,14 +35,12 @@ const Learn = () => {
     const keySequenceRef = useRef([]);
 
     const handleKeyPress = (note) => {
-        const task = currentScreen?.task;
-        const condition = task?.condition;
+    
+        if (!currentScreen || !currentScreen.notes) return;
 
-        if (!task || !task.notes || !condition) return;
+        const flattenedNotes = currentScreen.notes.flat();
 
-        const flattenedNotes = task.notes.flat();
-
-        if (condition.ordered && !condition.chord) {
+        if (currentScreen.ordered && !currentScreen.chord) {
             keySequenceRef.current.push(note);
             if (keySequenceRef.current.length > 2) keySequenceRef.current.shift();
 
@@ -54,9 +52,9 @@ const Learn = () => {
                 keySequenceRef.current = [];
             }
         } else if (
-            condition.ordered === false &&
-            condition.consecutive === false &&
-            condition.allow_mistakes === true
+            currentScreen.ordered === false &&
+            currentScreen.consecutive === false &&
+            currentScreen.allow_mistakes === true
         ) {
             if (flattenedNotes.includes(note) && !keySequenceRef.current.includes(note)) {
                 keySequenceRef.current.push(note);
@@ -106,6 +104,7 @@ const Learn = () => {
             try {
                 const response = await Api.get(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/`);
                 setCurrentLesson(response.data);
+                console.log(response.data);
             } catch(err) {
                 console.error("Error lesson fetch:", err);
             }
@@ -196,21 +195,15 @@ const Learn = () => {
                         audioCtx={audioCtx}
                         adsrSettings={adsr}
                         masterGain={masterGain.current}
-                        highlightedNotes={currentScreen?.task?.notes || []}
+                        highlightedNotes={currentScreen?.notes || []}
                         onKeyPress={handleKeyPress}
                         showNote={showNotes}
                         showKey={showKeys}
                         />
                     )}
-                    {isLastScreen && (
-                        <div className="learn-button-container">
-                            <button onClick={async () => {
-                                try {
-                                    await Api.post(`http://localhost:8000/api/courses/${courseId}/lessons/${lessonId}/complete/`);
-                                    console.log("Lesson marked as completed");
-                                } catch (error) {
-                                    console.error("Error marking lesson complete:", error);
-                                } finally {
+                    <div className="learn-return-button-container">
+                        {isLastScreen && (
+                            <button onClick={() => {
                                     setLessonId(null);
                                     setLessonList([]);
                                     setCourseId(null);
@@ -218,11 +211,11 @@ const Learn = () => {
                                     setCurrentScreen(null);
                                     setCurrentIndex(0);
                                 }
-                            }}>
+                            }>
                                 Return to Course Selection
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </>
             )}
         </div>

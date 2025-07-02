@@ -20,3 +20,16 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'title', 'description', 'lessons']
+
+    def create(self, validated_data):
+        lessons_data = validated_data.pop('lessons', [])
+        course = Course.objects.create(**validated_data)
+
+        for lesson_data in lessons_data:
+            screens_data = lesson_data.pop('screens', [])
+            lesson = Lesson.objects.create(course=course, **lesson_data)
+
+            for screen_data in screens_data:
+                Screen.objects.create(lesson=lesson, **screen_data)
+
+        return course

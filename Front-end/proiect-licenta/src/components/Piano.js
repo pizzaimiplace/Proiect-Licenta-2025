@@ -29,10 +29,6 @@ const keys = [
 ];
 
 const Piano = ({ mode, wave, audioCtx, adsrSettings, masterGain, highlightedNotes = [], onKeyPress, showNote, showKey }) => {
-    /*const samples = {};
-    keys.forEach(({ note }) => {
-        samples[note] = new Audio(`sounds/${note}.mp3`);
-    });*/
 
     const samplesRef = useRef({});
 
@@ -87,36 +83,6 @@ const Piano = ({ mode, wave, audioCtx, adsrSettings, masterGain, highlightedNote
         const midiNumber = (parseInt(octave, 10) + 1) * 12 + semitoneIndex;
 
         return 440 * Math.pow(2, (midiNumber - 69) / 12);
-
-        /*const noteFrequencies = {
-        'C4': 261.63,
-        'Cs4': 277.18,
-        'D4': 293.66,
-        'Ds4': 311.13,
-        'E4': 329.63,
-        'F4': 349.23,
-        'Fs4': 369.99,
-        'G4': 392.00,
-        'Gs4': 415.30,
-        'A4': 440.00,
-        'As4': 466.16,
-        'B4': 493.88,
-        'C5': 523.25,
-        'Cs5': 554.37,
-        'D5': 587.33,
-        'Ds5': 622.25,
-        'E5': 659.26,
-        'F5': 698.46,
-        'Fs5': 739.99,
-        'G5': 783.99,
-        'Gs5': 830.61,
-        'A5': 880.00,
-        'As5': 932.33,
-        'B5': 987.77,
-        };
-
-        
-        return noteFrequencies[note];*/
     };
 
     const handlePlay = useCallback((note) => {
@@ -130,16 +96,10 @@ const Piano = ({ mode, wave, audioCtx, adsrSettings, masterGain, highlightedNote
         playOscillator(getFrequency(note));
         } 
         else {
-           
-            //const audio = samples[note];
             const original =samplesRef.current[note];
 
             if (original) {
-                
-                //const original = samples[note];
                 const audio = original.cloneNode();
-                /*const source = audioCtx.createMediaElementSource(audio);
-                source.connect(masterGain);*/
                 audio.play();   
             }
         }

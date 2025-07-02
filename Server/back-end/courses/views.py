@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .progress_utils import complete_lesson
 from .models import Course, Lesson, Screen
 from .serializers import CourseSerializer, LessonSerializer, ScreenSerializer
 
@@ -125,19 +124,3 @@ class ScreenMixinView(
         lesson_id = self.kwargs.get('lesson_id')
         lesson = Lesson.objects.get(id=lesson_id)
         serializer.save(lesson=lesson)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def complete_lesson_view(request, course_id, lesson_id):
-    try:
-        course = Course.objects.get(id=course_id)
-    except Course.DoesNotExist:
-        return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    try:
-        lesson = Lesson.objects.get(id=lesson_id, course=course)
-    except Lesson.DoesNotExist:
-        return Response({"error": "Lesson not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    course_completed = complete_lesson(request.user, lesson)
-    return Response({"status": "Lesson marked as completed", "course_completed": course_completed}, status=status.HTTP_200_OK)
